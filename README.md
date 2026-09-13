@@ -45,7 +45,17 @@ In development, if `MONGO_URI` is missing or invalid, the server attempts to sta
 
    On macOS or Linux, use `cp .env.example .env` instead.
 
-4. Update `.env` with your MongoDB URI and authentication values.
+4. Update `.env` with your MongoDB URI, authentication values, and frontend origins.
+
+  `ALLOWED_ORIGINS` must contain the exact origin of the deployed frontend, including
+  the protocol and excluding the trailing slash. Multiple origins can be separated by
+  commas:
+
+  ```env
+  ALLOWED_ORIGINS=https://your-frontend.vercel.app,https://www.example.com
+  ```
+
+  Do not use `*`; the API uses cookie-based authentication and requires explicit origins.
 
 5. Start the development server.
 
@@ -62,7 +72,7 @@ The API is available at `http://localhost:5000` by default.
 | `PORT` | No | HTTP port. Defaults to `5000`. |
 | `NODE_ENV` | No | Use `development` locally and `production` when deployed. |
 | `MONGO_URI` | Production | MongoDB connection string. |
-| `ALLOWED_ORIGINS` | Production | Comma-separated frontend origins allowed by CORS. |
+| `ALLOWED_ORIGINS` | Production | Comma-separated frontend origins allowed by CORS. Use exact HTTPS origins without trailing slashes. |
 | `AUTH_JWT_SECRET` | Production | JWT signing secret; must be at least 32 characters. |
 | `AUTH_PRIMARY_PASSCODE` | Production | Passcode for the primary authentication gate. |
 | `AUTH_OFFICER_PASSWORD` | Production | Initial officer account password. |
@@ -167,7 +177,7 @@ npm start      # Start the production process
 
 ## Production Notes
 
-Set `NODE_ENV=production` and provide every production environment variable before starting the server. Production requests must use HTTPS, and `ALLOWED_ORIGINS` must contain the frontend origin.
+Set `NODE_ENV=production` and provide every production environment variable before starting the server. Production requests must use HTTPS, and `ALLOWED_ORIGINS` must contain the exact deployed frontend origin. On Render, add `ALLOWED_ORIGINS` in the backend service's Environment settings, then redeploy the service after changing it.
 
 The API applies a general rate limit of 150 requests per 15 minutes and a stricter authentication limit of 10 attempts per 15 minutes.
 
