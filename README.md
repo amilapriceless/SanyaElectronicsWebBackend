@@ -161,7 +161,7 @@ Arrears request bodies include `outstanding`, and may include `overdueAccounts`,
 ## Development Scripts
 
 ```bash
-npm run dev    # Start with nodemon
+npm run dev    # Start the development server
 npm start      # Start the production process
 ```
 
