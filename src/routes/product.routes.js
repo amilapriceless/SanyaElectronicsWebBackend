@@ -11,6 +11,7 @@ import {
 import asyncHandler from "../utils/asyncHandler.js";
 
 import validate from "../middleware/validate.middleware.js";
+import { requireAuth, requireRole } from "../middleware/auth.middleware.js";
 
 import {
   createProductSchema,
@@ -21,6 +22,8 @@ const router = express.Router();
 
 router.post(
   "/",
+  requireAuth,
+  requireRole("systemAdmin"),
   validate(createProductSchema),
   asyncHandler(create)
 );
@@ -37,12 +40,16 @@ router.get(
 
 router.put(
   "/:id",
+  requireAuth,
+  requireRole("systemAdmin"),
   validate(updateProductSchema),
   asyncHandler(update)
 );
 
 router.delete(
   "/:id",
+  requireAuth,
+  requireRole("systemAdmin"),
   asyncHandler(remove)
 );
 

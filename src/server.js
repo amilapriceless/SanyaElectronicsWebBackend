@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 import app from "./app.js";
 import connectDB from "./config/db.js";
+import { validateEnvironment } from "./config/environment.js";
 
 const PORT = process.env.PORT || 5000;
 let server;
@@ -30,6 +31,7 @@ const shutdown = async (signal) => {
 
 const startServer = async () => {
   try {
+    validateEnvironment();
     await connectDB();
 
     server = app.listen(PORT, () => {

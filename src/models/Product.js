@@ -57,7 +57,9 @@ const productSchema = new mongoose.Schema(
 
     description: {
       type: String,
-      required: true,
+      required: function () {
+        return this.category !== "AC";
+      },
       trim: true,
     },
 
@@ -76,8 +78,22 @@ const productSchema = new mongoose.Schema(
 
     technology: {
       type: String,
-      required: true,
+      required: function () {
+        return this.category !== "Blenders";
+      },
       trim: true,
+    },
+
+    btuCount: {
+      type: Number,
+      required: function () {
+        return this.category === "AC";
+      },
+      min: 1,
+      validate: {
+        validator: Number.isInteger,
+        message: "BTU count must be a whole number",
+      },
     },
 
     // Prices

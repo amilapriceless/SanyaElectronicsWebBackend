@@ -42,7 +42,8 @@ const productFields = {
   description: z
     .string()
     .min(10, "Description must be at least 10 characters")
-    .trim(),
+    .trim()
+    .optional(),
 
   powerConsumption: z
     .number()
@@ -56,7 +57,14 @@ const productFields = {
   technology: z
     .string()
     .min(2, "Technology is required")
-    .trim(),
+    .trim()
+    .optional(),
+
+  btuCount: z
+    .number()
+    .int("BTU count must be a whole number")
+    .positive("BTU count must be positive")
+    .optional(),
 
   prices: z.object({
     cash: z
@@ -91,7 +99,31 @@ const productFields = {
     .default([]),
 };
 
-export const createProductSchema = z.object(productFields);
+export const createProductSchema = z.object(productFields).superRefine((product, context) => {
+  if (product.category !== "Blenders" && !product.technology) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["technology"],
+      message: "Technology is required",
+    });
+  }
+
+  if (product.category !== "AC" && !product.description) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["description"],
+      message: "Description is required",
+    });
+  }
+
+  if (product.category === "AC" && product.btuCount === undefined) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["btuCount"],
+      message: "BTU count is required for AC products",
+    });
+  }
+});
 
 export const updateProductSchema = z.object({
   productCode: productFields.productCode.optional(),
@@ -110,6 +142,8 @@ export const updateProductSchema = z.object({
     productFields.powerConsumptionUnit.optional(),
 
   technology: productFields.technology.optional(),
+
+  btuCount: productFields.btuCount,
 
   prices: z
     .object({
@@ -137,4 +171,12 @@ export const updateProductSchema = z.object({
   specifications: productFields.specifications.optional(),
 
   warranty: productFields.warranty.optional(),
+}).superRefine((product, context) => {
+  if (product.category === "AC" && product.btuCount === undefined) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["btuCount"],
+      message: "BTU count is required for AC products",
+    });
+  }
 });
